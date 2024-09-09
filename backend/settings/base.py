@@ -1,23 +1,22 @@
-from pathlib import Path
+import os
 from os import getenv, path
-from datetime import timedelta
+from pathlib import Path
 
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-APPS_DIR = BASE_DIR / "core_apps"
+APPS_DIR = os.path.join(BASE_DIR, "core_apps")
 
-prod_env_file = path.join(BASE_DIR, ".envs", ".env.production")
 
-if path.isfile(prod_env_file):
-    load_dotenv(prod_env_file)
+local_env_file = path.join(BASE_DIR, ".envs", ".env.local")
 
+if path.isfile(local_env_file):
+    load_dotenv(local_env_file)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
 
 # Application definition
 
@@ -36,17 +35,19 @@ THIRD_PARTY_APPS = [
     "django_countries",
     "phonenumber_field",
     "drf_yasg",
-    "djoser",
-    "social_django",
-    "taggit",
-    "django_filters",
-    "djcelery_email",
-    "cloudinary",
-    "django_celery_beat",
+    # "djoser",
+    # "social_django",
+    # "taggit",
+    # "django_filters",
+    # "djcelery_email",
+    # "django_celery_beat",
 ]
 
 LOCAL_APPS = [
-
+    "core_apps.common",
+    # "core_apps.users",
+    # "core_apps.profiles",
+    # "core_apps.ratings",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -61,12 +62,12 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "config.urls"
+ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [str(APPS_DIR / "templates")],
+        "DIRS": [os.path.join(APPS_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -79,7 +80,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "config.wsgi.application"
+WSGI_APPLICATION = "backend.wsgi.application"
 
 
 # Database
@@ -88,11 +89,11 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": getenv("POSTGRES_DB"),
-        "USER": getenv("POSTGRES_USER"),
-        "PASSWORD": getenv("POSTGRES_PASSWORD"),
-        "HOST": getenv("POSTGRES_HOST"),
-        "PORT": getenv("POSTGRES_PORT"),
+        "NAME": "realestate",
+        "USER": "ayiek",
+        "PASSWORD": "0537",
+        "HOST": "localhost",
+        "PORT": "5432",
     }
 }
 
@@ -150,11 +151,9 @@ STATIC_ROOT = str(BASE_DIR / "staticfiles")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# AUTH_USER_MODEL = "users.User"
 
-TAGGIT_CASE_INSENSITIVE = True
-
-#AUTH_USER_MODEL = "users.User"
-
+ADMIN_URL = "hidden"
 
 if USE_TZ:
     CELERY_TIMEZONE = TIME_ZONE
