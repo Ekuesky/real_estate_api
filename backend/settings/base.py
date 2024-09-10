@@ -38,15 +38,15 @@ THIRD_PARTY_APPS = [
     # "djoser",
     # "social_django",
     # "taggit",
-    # "django_filters",
+    "django_filters",
     # "djcelery_email",
     # "django_celery_beat",
 ]
 
 LOCAL_APPS = [
     "core_apps.common",
-    # "core_apps.users",
-    # "core_apps.profiles",
+    "core_apps.users",
+    "core_apps.profiles",
     # "core_apps.ratings",
 ]
 
