@@ -1,0 +1,73 @@
+erDiagram
+    User ||--o{ Apartment : "tenant"
+    User ||--o{ Issue : "reported_by"
+    User ||--o{ Issue : "assigned_to"
+    User ||--o{ Post : "author"
+    User }|--|| Profile : "has"
+    User ||--o{ Rating : "rated_user"
+    User ||--o{ Rating : "rating_user"
+    User ||--o{ Report : "reported_by"
+    User ||--o{ Report : "reported_user"
+    Apartment ||--o{ Issue : "has"
+    Post }o--o{ User : "bookmarked_by"
+    Post }o--o{ User : "upvoted_by"
+    Post }o--o{ User : "downvoted_by"
+
+    User {
+        UUID id PK
+        string first_name
+        string last_name
+        string email
+        string username
+    }
+
+    Apartment {
+        UUID id PK
+        string unit_number
+        string building
+        int floor
+    }
+
+    Issue {
+        UUID id PK
+        string title
+        string description
+        string status
+        string priority
+        date resolved_on
+    }
+
+    Post {
+        UUID id PK
+        string title
+        string slug
+        string body
+        int upvotes
+        int downvotes
+    }
+
+    Profile {
+        UUID id PK
+        string gender
+        string bio
+        string occupation
+        string phone_number
+        string country_of_origin
+        string city_of_origin
+        int report_count
+        int reputation
+        string slug
+    }
+
+    Rating {
+        UUID id PK
+        int rating
+        string comment
+    }
+
+    Report {
+        UUID id PK
+        string title
+        string slug
+        string description
+    }
