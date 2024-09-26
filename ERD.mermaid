@@ -8,13 +8,12 @@ erDiagram
     User ||--o{ Rating : "rating_user"
     User ||--o{ Report : "reported_by"
     User ||--o{ Report : "reported_user"
+    User ||--o{ Reply : "author"
     Apartment ||--o{ Issue : "has"
-    Post }o--o{ User : "bookmarked_by"
-    Post }o--o{ User : "upvoted_by"
-    Post }o--o{ User : "downvoted_by"
+    Post ||--o{ Reply : "has"
 
     User {
-        UUID id PK
+        UUID id
         string first_name
         string last_name
         string email
@@ -22,14 +21,12 @@ erDiagram
     }
 
     Apartment {
-        UUID id PK
         string unit_number
         string building
         int floor
     }
 
     Issue {
-        UUID id PK
         string title
         string description
         string status
@@ -38,7 +35,6 @@ erDiagram
     }
 
     Post {
-        UUID id PK
         string title
         string slug
         string body
@@ -47,7 +43,6 @@ erDiagram
     }
 
     Profile {
-        UUID id PK
         string gender
         string bio
         string occupation
@@ -60,14 +55,16 @@ erDiagram
     }
 
     Rating {
-        UUID id PK
         int rating
         string comment
     }
 
     Report {
-        UUID id PK
         string title
         string slug
         string description
+    }
+
+    Reply {
+        string body
     }
