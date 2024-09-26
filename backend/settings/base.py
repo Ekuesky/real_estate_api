@@ -45,8 +45,8 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "core_apps.common",
-    "core_apps.users",
-    "core_apps.profiles",
+    #"core_apps.users",
+    #"core_apps.profiles",
     # "core_apps.ratings",
 ]
 
@@ -89,11 +89,11 @@ WSGI_APPLICATION = "backend.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "realestate",
-        "USER": "ayiek",
-        "PASSWORD": "0537",
-        "HOST": "localhost",
-        "PORT": "5432",
+        "NAME": getenv("POSTGRES_DB"),
+        "USER": getenv("POSTGRES_USER"),
+        "PASSWORD": getenv("POSTGRES_PASSWORD"),
+        "HOST": getenv("POSTGRES_HOST"),
+        "PORT": getenv("POSTGRES_PORT"),
     }
 }
 
@@ -151,7 +151,7 @@ STATIC_ROOT = str(BASE_DIR / "staticfiles")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# AUTH_USER_MODEL = "users.User"
+#AUTH_USER_MODEL = "users.User"
 
 ADMIN_URL = "hidden"
 
@@ -182,22 +182,4 @@ CELERY_BEAT_SCHEDULE = {
     "update-reputations-every-day": {
         "task": "update_all_reputations",
     }
-}
-
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "%(levelname)s %(name)-12s %(asctime)s %(module)s %(process)d %(thread)d %(message)s"
-        }
-    },
-    "handlers": {
-        "console": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-            "formatter": "verbose",
-        }
-    },
-    "root": {"level": "INFO", "handlers": ["console"]},
 }
