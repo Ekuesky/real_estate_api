@@ -1,0 +1,56 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="BadExpressionStatementJS" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="DuplicatedCode" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <Languages>
+        <language minSize="103" name="Python" />
+      </Languages>
+    </inspection_tool>
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="22">
+            <item index="0" class="java.lang.String" itemvalue="mysqlclient" />
+            <item index="1" class="java.lang.String" itemvalue="django-filter" />
+            <item index="2" class="java.lang.String" itemvalue="django-restql" />
+            <item index="3" class="java.lang.String" itemvalue="Django" />
+            <item index="4" class="java.lang.String" itemvalue="python-dotenv" />
+            <item index="5" class="java.lang.String" itemvalue="requests" />
+            <item index="6" class="java.lang.String" itemvalue="djangorestframework" />
+            <item index="7" class="java.lang.String" itemvalue="django-debug-toolbar" />
+            <item index="8" class="java.lang.String" itemvalue="core" />
+            <item index="9" class="java.lang.String" itemvalue="locust" />
+            <item index="10" class="java.lang.String" itemvalue="PyJWT" />
+            <item index="11" class="java.lang.String" itemvalue="asgiref" />
+            <item index="12" class="java.lang.String" itemvalue="redis" />
+            <item index="13" class="java.lang.String" itemvalue="django-silk" />
+            <item index="14" class="java.lang.String" itemvalue="sqlparse" />
+            <item index="15" class="java.lang.String" itemvalue="celery" />
+            <item index="16" class="java.lang.String" itemvalue="djangorestframework-simplejwt" />
+            <item index="17" class="java.lang.String" itemvalue="pymysql" />
+            <item index="18" class="java.lang.String" itemvalue="django-redis" />
+            <item index="19" class="java.lang.String" itemvalue="drf-nested-routers" />
+            <item index="20" class="java.lang.String" itemvalue="pytz" />
+            <item index="21" class="java.lang.String" itemvalue="django-cors-headers" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="false" level="WARNING" enabled_by_default="false">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="datproject.appdat.models.DepositTermTypes.objects" />
+          <option value="datproject.appdat.models.Configurations.objects" />
+          <option value="datproject.appdat.models.PayementTypes.*" />
+          <option value="datproject.appdat.models.Rates.*" />
+          <option value="backend.backend.urls.*" />
+          <option value="str.__truediv__" />
+          <option value="type.with_ui" />
+          <option value="backend.core_apps.invoices.models.core_apps" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="SqlNoDataSourceInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+  </profile>
+</component>
