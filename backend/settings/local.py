@@ -12,6 +12,14 @@ SECRET_KEY = getenv(
     "django-insecure-z=%v8my#l%p&+2s7ip&d@^uy8t%eh88w!^k0@_)##e9s)g!4sb",
 )
 
+ADMIN_URL = getenv("DJANGO_ADMIN_URL")
+EMAIL_BACKEND = "djcelery_email.backends.CeleryEmailBackend"
+EMAIL_HOST = getenv("EMAIL_HOST")
+EMAIL_PORT = getenv("EMAIL_PORT")
+DEFAULT_FROM_EMAIL = getenv("DEFAULT_FROM_EMAIL")
+DOMAIN = getenv("DOMAIN")
+
+
 LOGGING ={
     "version": 1,
     "disable_existing_loggers": False, #don't disable existing loggers

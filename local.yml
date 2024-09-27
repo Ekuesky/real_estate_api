@@ -1,0 +1,76 @@
+
+services:
+  api: &api
+    build:
+      context: .
+      dockerfile: ./docker/local/django/Dockerfile
+    image: estate_api
+    container_name: estate_api
+    volumes:
+      - .:/app:z
+      - ./staticfiles:/app/staticfiles
+    ports:
+      - "8000:8000"
+    #expose:
+    #  - "8000"
+    env_file:
+      - ./.envs/.env.local
+    depends_on:
+      - postgres
+      - mailpit
+#      - redis
+    command: /start
+    networks:
+      - estate_nw
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./docker/local/postgres/Dockerfile
+    image: estate_postgres
+    container_name: estate_postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - estate_postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./.envs/.env.local
+    networks:
+      - estate_nw
+
+  mailpit:
+    image: docker.io/axllent/mailpit:v1.15
+    container_name: estate_mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    volumes:
+      - estate_mailpit_data:/data
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATA_FILE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - estate_nw
+
+#  redis:
+#    image: redis:7.0-alpine3.19
+#    command: redis-server --appendonly yes
+#    container_name: estate_redis
+#    volumes:
+#      - estate_redis_data:/data
+#    networks:
+#      - estate_nw
+
+
+networks:
+  estate_nw:
+    external: true
+
+volumes:
+  estate_postgres_data: {}
+  estate_mailpit_data: {}
+  logs_store: {}
+  estate_redis_data: {}
+
