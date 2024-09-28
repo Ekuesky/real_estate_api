@@ -72,5 +72,5 @@ volumes:
   estate_postgres_data: {}
   estate_mailpit_data: {}
   logs_store: {}
-  estate_redis_data: {}
+  #estate_redis_data: {}
 
