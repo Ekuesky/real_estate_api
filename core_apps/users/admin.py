@@ -12,6 +12,7 @@ User = get_user_model()
 class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
+    # list the fields that should be displayed in the admin
     list_display = [
         "pkid",
         "id",
@@ -21,9 +22,12 @@ class UserAdmin(BaseUserAdmin):
         "username",
         "is_superuser",
     ]
+    # enable the user to be linked directly from the user list in the admin site
     list_display_links = ["pkid", "id", "email", "username"]
     search_fields = ["email", "first_name", "last_name"]
     ordering = ["pkid"]
+
+    # define the way fields are grouped and displayed in user update form
     fieldsets = (
         (_("Login Credentials"), {"fields": ("email", "password")}),
         (_("Personal info"), {"fields": ("first_name", "last_name", "username")}),
@@ -41,6 +45,7 @@ class UserAdmin(BaseUserAdmin):
         ),
         (_("Important Dates"), {"fields": ("last_login", "date_joined")}),
     )
+    # define the way fields are grouped and displayed  in the user creation form
     add_fieldsets = (
         (
             None,

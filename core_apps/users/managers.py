@@ -25,6 +25,7 @@ class UserManager(DjangoUserManager):
 
         email = self.normalize_email(email)
         validate_email_address(email)
+        # Récupère dynamiquement le modèle utilisateur global.
         global_user_model = apps.get_model(
             self.model._meta.app_label, self.model._meta.object_name
         )

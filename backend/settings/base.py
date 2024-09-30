@@ -45,7 +45,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "core_apps.common",
-    #"core_apps.users",
+    "core_apps.users",
     #"core_apps.profiles",
     # "core_apps.ratings",
 ]
@@ -151,7 +151,7 @@ STATIC_ROOT = str(BASE_DIR / "staticfiles")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-#AUTH_USER_MODEL = "users.User"
+AUTH_USER_MODEL = "users.User"
 
 ADMIN_URL = "hidden"
 

@@ -54,6 +54,26 @@ services:
     networks:
       - estate_nw
 
+
+  client:
+    build:
+      context: ./frontend
+      dockerfile: ./docker/local/Dockerfile
+    container_name: estate_frontend
+    image: estate_frontend
+    ports:
+       - "3000:3000"
+#    expose:
+#      - "3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    # add this line(uncomment it) so that hot module reloading can work when working with windows subsystem for linux.
+    # environment:
+      - WATCHPACK_POLLING=true
+    networks:
+      - estate_nw
+
 #  redis:
 #    image: redis:7.0-alpine3.19
 #    command: redis-server --appendonly yes
@@ -71,6 +91,6 @@ networks:
 volumes:
   estate_postgres_data: {}
   estate_mailpit_data: {}
-  logs_store: {}
+  #logs_store: {}
   #estate_redis_data: {}
 
