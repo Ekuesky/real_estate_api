@@ -34,25 +34,24 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   sudo git bash-completion nano ssh
 
 # Crée un utilisateur et un groupe "django", et configure les permissions pour les fichiers statiques.
-RUN addgroup --system django && \
-  adduser --system --ingroup django django && \
-  mkdir -p ${APP_HOME}/staticfiles && \
-  chown django:django ${APP_HOME}/staticfiles && \
-  chmod 775 ${APP_HOME}/staticfiles \
+RUN addgroup --system django \
+    && adduser --system --ingroup django django \
+    && mkdir -p ${APP_HOME}/staticfiles \
+    && chown django:django ${APP_HOME}/staticfiles \
+    && chmod 775 ${APP_HOME}/staticfiles
 
 # Installe des dépendances supplémentaires et nettoie le cache APT.
-RUN apt-get update && apt-get install --no-install-recommends -y \
-  libpq-dev \
-  gettext \
-  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-  && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y libpq-dev gettext \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copie les wheels Python créés dans l'étape précédente.
 COPY --from=python-build-stage /usr/src/app/wheels /wheels/
 
 # Installe les wheels Python et supprime le dossier wheels.
 RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
-  && rm -rf /wheels/
+    && rm -rf /wheels/
 
 # Copie le script d'entrée, corrige les fins de ligne et le rend exécutable.
 COPY --chown=django:django ./docker/local/django/entrypoint.sh /entrypoint
