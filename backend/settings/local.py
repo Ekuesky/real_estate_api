@@ -12,6 +12,9 @@ SECRET_KEY = getenv(
     "django-insecure-z=%v8my#l%p&+2s7ip&d@^uy8t%eh88w!^k0@_)##e9s)g!4sb",
 )
 
+# Tells django to trust requests from origins
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8080"]
+
 ADMIN_URL = getenv("DJANGO_ADMIN_URL")
 EMAIL_BACKEND = "djcelery_email.backends.CeleryEmailBackend"
 EMAIL_HOST = getenv("EMAIL_HOST")
