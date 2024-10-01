@@ -18,7 +18,7 @@ services:
     depends_on:
       - postgres
       - mailpit
-#      - redis
+      - redis
     command: /start
     networks:
       - estate_nw
@@ -30,7 +30,7 @@ services:
     image: estate_postgres
     container_name: estate_postgres
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - estate_postgres_data:/var/lib/postgresql/data
     env_file:
@@ -55,7 +55,7 @@ services:
       - estate_nw
 
 
-  client:
+  frontend:
     build:
       context: ./../frontend
       dockerfile: ./docker/local/Dockerfile
@@ -74,14 +74,35 @@ services:
     networks:
       - estate_nw
 
-#  redis:
-#    image: redis:7.0-alpine3.19
-#    command: redis-server --appendonly yes
-#    container_name: estate_redis
-#    volumes:
-#      - estate_redis_data:/data
-#    networks:
-#      - estate_nw
+  redis:
+    image: redis:7.0-alpine3.19
+    command: redis-server --appendonly yes
+    container_name: estate_redis
+    volumes:
+      - estate_redis_data:/data
+    networks:
+      - estate_nw
+
+  celeryworker:
+    <<: *api
+    image: estate_celeryworker
+    container_name: estate_celeryworker
+    command: /start-celeryworker
+
+  celerybeat:
+    <<: *api
+    image: estate_celerybeat
+    container_name: estate_celerybeat
+    command: /start-celerybeat
+
+  flower:
+    <<: *api
+    image: estate_flower
+    container_name: estate_flower
+    ports:
+      - "5555:5555"
+    command: /start-flower
+
   nginx:
     build:
       context: ./docker/local/nginx
@@ -106,5 +127,5 @@ volumes:
   estate_postgres_data: {}
   estate_mailpit_data: {}
   logs_store: {}
-  #estate_redis_data: {}
+  estate_redis_data: {}
 

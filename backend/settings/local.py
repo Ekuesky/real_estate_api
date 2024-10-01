@@ -1,4 +1,5 @@
 from .base import *
+import cloudinary
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -48,3 +49,12 @@ LOGGING ={
         },
     },
 }
+CLOUDINARY_CLOUD_NAME = getenv("CLOUDINARY_CLOUD_NAME")
+CLOUDINARY_API_KEY = getenv("CLOUDINARY_API_KEY")
+CLOUDINARY_API_SECRET = getenv("CLOUDINARY_API_SECRET")
+
+cloudinary.config(
+    cloud_name=CLOUDINARY_CLOUD_NAME,
+    api_key=CLOUDINARY_API_KEY,
+    api_secret=CLOUDINARY_API_SECRET,
+)

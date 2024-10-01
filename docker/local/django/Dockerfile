@@ -9,11 +9,11 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   build-essential \
   libpq-dev
 
-COPY ./requirements .
+COPY ./requirements requirements
 
 #Crée des wheels Python pour les dépendances listées dans le fichier correspondant à BUILD_ENVIRONMENT.
 RUN pip wheel --wheel-dir /usr/src/app/wheels \
-  -r ${BUILD_ENVIRONMENT}.txt
+  -r requirements/${BUILD_ENVIRONMENT}.txt
 
 # Etape 2: Python run stage.
 FROM python as python-run-stage
@@ -62,12 +62,27 @@ COPY --chown=django:django ./docker/local/django/start.sh /start
 RUN sed -i 's/\r$//g' /start
 RUN chmod +x /start
 
+COPY --chown=django:django ./docker/local/django/celery/flower/start.sh /start-flower
+RUN sed -i 's/\r$//g' /start-flower
+RUN chmod +x /start-flower
+
+COPY --chown=django:django ./docker/local/django/celery/worker/start.sh /start-celeryworker
+RUN sed -i 's/\r$//g' /start-celeryworker
+RUN chmod +x /start-celeryworker
+
+COPY --chown=django:django ./docker/local/django/celery/beat/start.sh /start-celerybeat
+RUN sed -i 's/\r$//g' /start-celerybeat
+RUN chmod +x /start-celerybeat
+
 
 # Copie le reste des fichiers de l'application dans le conteneur.
 COPY --chown=django:django . ${APP_HOME}
 
 # Change le propriétaire du répertoire de l'application
-RUN chown django:django ${APP_HOME}
+RUN chown -R django:django ${APP_HOME}
+
+#  Important: ensure you have the correct permissions on your staticfiles folder:
+RUN chmod -R 775 ${APP_HOME}/staticfiles
 
 # Bascule vers l'utilisateur django.
 USER django

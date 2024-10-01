@@ -2,6 +2,7 @@ config:
 	docker compose -f local.yml config
 
 build:
+	#docker buildx create --use
 	docker compose -f local.yml up --build -d --remove-orphans
 
 up:
