@@ -47,7 +47,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "core_apps.common",
     "core_apps.users",
-    #"core_apps.profiles",
+    "core_apps.profiles",
     # "core_apps.ratings",
 ]
 
@@ -55,8 +55,8 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -143,7 +143,7 @@ SITE_ID = 1
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "/staticfiles/"
+STATIC_URL = "/static/"
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 

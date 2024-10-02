@@ -82,7 +82,7 @@ COPY --chown=django:django . ${APP_HOME}
 RUN chown -R django:django ${APP_HOME}
 
 #  Important: ensure you have the correct permissions on your staticfiles folder:
-RUN chmod -R 775 ${APP_HOME}/staticfiles
+RUN chmod -R 775 ${APP_HOME}
 
 # Bascule vers l'utilisateur django.
 USER django

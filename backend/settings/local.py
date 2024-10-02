@@ -4,7 +4,6 @@ import cloudinary
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
 
 SITE_NAME = getenv("SITE_NAME")
 
@@ -14,7 +13,9 @@ SECRET_KEY = getenv(
 )
 
 # Tells django to trust requests from origins
-CSRF_TRUSTED_ORIGINS = ["http://localhost:8080"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8080", "http://127.0.0.1:8080"]
+
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
 
 ADMIN_URL = getenv("DJANGO_ADMIN_URL")
 EMAIL_BACKEND = "djcelery_email.backends.CeleryEmailBackend"

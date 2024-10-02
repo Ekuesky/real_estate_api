@@ -34,6 +34,6 @@ urlpatterns = [
     # path("api/v1/posts/", include("core_apps.posts.urls")),
 ]
 
-admin.site.site_header = "Ayiek Apartments Admin"
-admin.site.site_title = "Ayiek Apartments Admin Portal"
-admin.site.index_title = "Welcome to Alpha Apartments Admin Portal"
+admin.site.site_header = "RealEstate Apartments Admin"
+admin.site.site_title = "RealEstate Apartments Admin Portal"
+admin.site.index_title = "Welcome to real estate Apartments Admin Portal"
