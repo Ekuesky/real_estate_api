@@ -1,6 +1,7 @@
 import os
 from os import getenv, path
 from pathlib import Path
+from datetime import timedelta
 
 from dotenv import load_dotenv
 
@@ -197,48 +198,99 @@ COOKIE_HTTPONLY = True
 # La valeur est lue depuis une variable d'environnement, avec "True" comme valeur par défaut
 COOKIE_SECURE = getenv("COOKIE_SECURE", "True") == "True"
 
-# REST_FRAMEWORK = {
-#     "DEFAULT_AUTHENTICATION_CLASSES": (
-#         "core_apps.common.cookie_auth.CookieAuthentication",
-#     ),
-#     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-#     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-#     "DEFAULT_FILTER_BACKENDS": [
-#         "django_filters.rest_framework.DjangoFilterBackend",
-#     ],
-#     "PAGE_SIZE": 10,
-#     "DEFAULT_THROTTLE_CLASSES": (
-#         "rest_framework.throttling.AnonRateThrottle",
-#         "rest_framework.throttling.UserRateThrottle",
-#     ),
-#     "DEFAULT_THROTTLE_RATES": {
-#         "anon": "200/day",
-#         "user": "500/day",
-#     },
-# }
-#
-# SIMPLE_JWT = {
-#     "SIGNING_KEY": getenv("SIGNING_KEY"),
-#     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-#     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-#     "ROTATE_REFRESH_TOKENS": True,
-#     "USER_ID_FIELD": "id",
-#     "USER_ID_CLAIM": "user_id",
-# }
-#
-# DJOSER = {
-#     "USER_ID_FIELD": "id",
-#     "LOGIN_FIELD": "email",
-#     "TOKEN_MODEL": None,
-#     "USER_CREATE_PASSWORD_RETYPE": True,
-#     "SEND_ACTIVATION_EMAIL": True,
-#     "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
-#     "PASSWORD_RESET_CONFIRM_RETYPE": True,
-#     "ACTIVATION_URL": "activate/{uid}/{token}",
-#     "PASSWORD_RESET_CONFIRM_URL": "password-reset/{uid}/{token}",
-#     "SOCIAL_AUTH_ALLOWED_REDIRECT_URIS": getenv("REDIRECT_URIS", "").split(","),
-#     "SERIALIZERS": {
-#         "user_create": "core_apps.users.serializers.CreateUserSerializer",
-#         "current_user": "core_apps.users.serializers.CustomUserSerializer",
-#     },
-# }
+REST_FRAMEWORK = {
+    # Définit la classe d'authentification par défaut pour l'API, Utilise une classe personnalisée CookieAuthentication pour l'authentification
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "core_apps.common.cookie_auth.CookieAuthentication",
+    ),
+    # Définit la classe de permission par défaut, Requiert que l'utilisateur soit authentifié pour accéder à l'API
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+
+    # Spécifie la classe de pagination par défaut
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+
+    # Utilise DjangoFilterBackend pour permettre le filtrage des résultats
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+    ],
+    "PAGE_SIZE": 10,
+
+    # Spécifie les classes de limitation de débit (throttling) par défaut
+    # Applique des limites différentes pour les utilisateurs anonymes et authentifiés
+    "DEFAULT_THROTTLE_CLASSES": (
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ),
+
+    # Les utilisateurs anonymes sont limités à 200 requêtes par jour
+    # Les utilisateurs authentifiés sont limités à 500 requêtes par jour
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "200/day",
+        "user": "500/day",
+    },
+}
+
+SIMPLE_JWT = {
+    "SIGNING_KEY": getenv("SIGNING_KEY"),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "USER_ID_FIELD": "id",
+    # Spécifie la clé utilisée dans le payload du JWT pour stocker l'identifiant de l'utilisateur
+    "USER_ID_CLAIM": "user_id",
+}
+
+DJOSER = {
+    # Spécifie le champ utilisé comme identifiant unique de l'utilisateur
+    "USER_ID_FIELD": "id",
+
+    # Définit le champ utilisé pour l'authentification (ici, l'email)
+    "LOGIN_FIELD": "email",
+
+    # Désactive le modèle de token par défaut de Djoser
+    "TOKEN_MODEL": None,
+
+    # Oblige l'utilisateur à saisir deux fois le mot de passe lors de la création du compte
+    "USER_CREATE_PASSWORD_RETYPE": True,
+
+    # Active l'envoi d'un email d'activation lors de la création du compte
+    "SEND_ACTIVATION_EMAIL": True,
+
+    # Envoie un email de confirmation lorsqu'un mot de passe est changé
+    "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
+
+    # Oblige l'utilisateur à saisir deux fois le nouveau mot de passe lors de la réinitialisation
+    "PASSWORD_RESET_CONFIRM_RETYPE": True,
+
+    # URL pour l'activation du compte (à compléter côté frontend)
+    "ACTIVATION_URL": "activate/{uid}/{token}",
+
+    # URL pour la confirmation de réinitialisation du mot de passe (à compléter côté frontend)
+    "PASSWORD_RESET_CONFIRM_URL": "password-reset/{uid}/{token}",
+
+    # Liste des URIs autorisés pour la redirection après authentification sociale
+    # Récupérée depuis une variable d'environnement et séparée par des virgules
+    "SOCIAL_AUTH_ALLOWED_REDIRECT_URIS": getenv("REDIRECT_URIS", "").split(","),
+
+    # Sérializers personnalisés pour la création d'utilisateur et l'utilisateur courant
+    "SERIALIZERS": {
+        "user_create": "core_apps.users.serializers.CreateUserSerializer",
+        "current_user": "core_apps.users.serializers.CustomUserSerializer",
+    },
+}
+
+# Définit la clé client Google OAuth2 à partir de la variable d'environnement GOOGLE_CLIENT_ID
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = getenv("GOOGLE_CLIENT_ID")
+
+# Définit le secret client Google OAuth2 à partir de la variable d'environnement GOOGLE_CLIENT_SECRET
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = getenv("GOOGLE_CLIENT_SECRET")
+
+# Définit les scopes d'autorisation Google OAuth2 requis (accès à l'email, au profil et à l'openid)
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile",
+    "openid",
+]
+
+# Définit les données supplémentaires à extraire du profil Google (prénom et nom)
+SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ["first_name", "last_name"]
