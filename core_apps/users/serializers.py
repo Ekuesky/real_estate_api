@@ -8,9 +8,13 @@ User = get_user_model()
 
 
 class CreateUserSerializer(UserCreateSerializer):
+    #convert email to lower case before after validation
+    def validate_email(self, email):
+        email = email.lower()
+        return super().validate_email(email)
     class Meta(UserCreateSerializer.Meta):
         model = User
-        fields = ["id", "username", "first_name", "last_name", "password"]
+        fields = ["id", "username","email", "first_name", "last_name", "password"]
 
 
 class CustomUserSerializer(UserSerializer):

@@ -17,7 +17,6 @@ if path.isfile(local_env_file):
     load_dotenv(local_env_file)
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # Application definition
 
@@ -37,12 +36,12 @@ THIRD_PARTY_APPS = [
     "django_countries",
     "phonenumber_field",
     "drf_yasg",
-    # "djoser",
-    # "social_django",
-    # "taggit",
+    "djoser",
+    "social_django",
+    "taggit",
     "django_filters",
-    # "djcelery_email",
-    # "django_celery_beat",
+    "djcelery_email",
+    "django_celery_beat",
 ]
 
 LOCAL_APPS = [
@@ -87,7 +86,6 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 
 # Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
     "default": {
@@ -126,10 +124,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "Africa/Lome"
@@ -140,17 +134,9 @@ USE_TZ = True
 
 SITE_ID = 1
 
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
 STATIC_URL = "/static/"
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -291,6 +277,10 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     "https://www.googleapis.com/auth/userinfo.profile",
     "openid",
 ]
-
 # Définit les données supplémentaires à extraire du profil Google (prénom et nom)
 SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ["first_name", "last_name"]
+
+AUTHENTICATION_BACKENDS = [
+    "social_core.backends.google.GoogleOAuth2", # Google OAuth
+    "django.contrib.auth.backends.ModelBackend", #default
+]

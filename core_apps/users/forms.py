@@ -27,7 +27,7 @@ class UserCreationForm(admin_forms.UserCreationForm):
         email = self.cleaned_data["email"]
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError(self.error_messages["duplicate_email"])
-        return email
+        return email.lower()
 
     def clean_username(self) -> str:
         username = self.cleaned_data["username"]

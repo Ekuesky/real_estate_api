@@ -17,6 +17,7 @@ flower
 djoser==2.2.2
 django-taggit==5.0.1
 django-filter==24.1
+django-celery-beat==2.6.0
 django-celery-email==3.0.0
 cloudinary==1.39.1
 whitenoise==5.3.0

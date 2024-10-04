@@ -20,15 +20,15 @@ FROM python as python-run-stage
 ARG BUILD_ENVIRONMENT=local
 
 ARG APP_HOME=/app
-
+# Définit le répertoire de travail.
+WORKDIR ${APP_HOME}
 # Configure des variables d'environnement Python.
 ENV PYTHONDONTWRITEBYTECODE 1
 
 ENV PYTHONUNBUFFERED 1
 
 ENV BUILD_ENV ${BUILD_ENVIRONMENT}
-# Définit le répertoire de travail.
-WORKDIR ${APP_HOME}
+
 # Installe des outils supplémentaires.
 RUN apt-get update && apt-get install --no-install-recommends -y \
   sudo git bash-completion nano ssh
@@ -76,7 +76,7 @@ RUN chmod +x /start-celerybeat
 
 
 # Copie le reste des fichiers de l'application dans le conteneur.
-COPY --chown=django:django . ${APP_HOME}
+COPY . ${APP_HOME}
 
 # Change le propriétaire du répertoire de l'application
 RUN chown -R django:django ${APP_HOME}
