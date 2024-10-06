@@ -169,7 +169,7 @@ CELERY_WORKER_SEND_TASK_EVENTS = True
 
 CELERY_BEAT_SCHEDULE = {
     "update-reputations-every-day": {
-        "task": "update_all_reputations",
+        "task": "update_reputation_score",
     }
 }
 # Nom du cookie utilisé pour l'accès
