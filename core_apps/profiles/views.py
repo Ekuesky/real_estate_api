@@ -33,6 +33,20 @@ class ProfileListAPIView(generics.ListAPIView):
             .filter(occupation=Profile.Occupation.TENANT)
         )
 
+class ProfileDetailAPIView(generics.RetrieveAPIView):
+    serializer_class = ProfileSerializer
+    renderer_classes = [GenericJSONRenderer]
+    object_label = "profile"
+
+    def get_queryset(self) -> QuerySet:
+        return Profile.objects.select_related("user").all()
+
+    def get_object(self) -> Profile:
+        try:
+            return Profile.objects.get(user=self.request.user)
+        except Profile.DoesNotExist:
+            raise Http404("Profile not found")
+
 class ProfileUpdateAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = UpdateProfileSerializer
     renderer_classes = [GenericJSONRenderer]
