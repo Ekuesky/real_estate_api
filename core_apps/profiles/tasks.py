@@ -8,7 +8,7 @@ from cloudinary import uploader
 def upload_avatar_to_cloudinary(profile_id: UUID, image_content: bytes) -> None:
     profile = Profile.objects.get(id=profile_id)
     response = uploader.upload(image_content)
-    profile.avatar = response["secure_url"]
+    profile.avatar = response["url"]
     profile.save()
 
 

@@ -1,29 +1,38 @@
-from .serializers import ProfileSerializer, UpdateProfileSerializer, AvatarUploadSerializer
-from .models import Profile
-from rest_framework.views import APIView
 from typing import List
-from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import QuerySet
-from rest_framework import filters, generics, status
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.response import  Response
-from django.http import  Http404
-from core_apps.common.renderers import GenericJSONRenderer
-from .tasks import  upload_avatar_to_cloudinary
 from django.contrib.auth import get_user_model
+from django.db.models import QuerySet
+from django.http import Http404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, generics
+from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from core_apps.common.renderers import GenericJSONRenderer
+from .models import Profile
+from .serializers import (
+    AvatarUploadSerializer,
+    ProfileSerializer,
+    UpdateProfileSerializer,
+)
+from .tasks import upload_avatar_to_cloudinary
 
 User = get_user_model()
+
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 9
     page_size_query_param = "page_size"
     max_page_size = 100
+
+
 class ProfileListAPIView(generics.ListAPIView):
     serializer_class = ProfileSerializer
-    renderer_classes = (GenericJSONRenderer, )
+    renderer_classes = [GenericJSONRenderer]
     pagination_class = StandardResultsSetPagination
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
-    search_fields = ['user__username', 'user__first_name', 'user__last_name']
+    object_label = "profiles"
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    search_fields = ["user__username", "user__first_name", "user__last_name"]
     filterset_fields = ["occupation", "gender", "country_of_origin"]
 
     def get_queryset(self) -> List[Profile]:
@@ -33,6 +42,7 @@ class ProfileListAPIView(generics.ListAPIView):
             .filter(occupation=Profile.Occupation.TENANT)
         )
 
+
 class ProfileDetailAPIView(generics.RetrieveAPIView):
     serializer_class = ProfileSerializer
     renderer_classes = [GenericJSONRenderer]
@@ -41,11 +51,14 @@ class ProfileDetailAPIView(generics.RetrieveAPIView):
     def get_queryset(self) -> QuerySet:
         return Profile.objects.select_related("user").all()
 
+        # This method defines how to retrieve the specific object based on the request.
+        # It fetches the profile associated with the current user (from request.user).
     def get_object(self) -> Profile:
         try:
             return Profile.objects.get(user=self.request.user)
         except Profile.DoesNotExist:
             raise Http404("Profile not found")
+
 
 class ProfileUpdateAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = UpdateProfileSerializer
@@ -102,4 +115,3 @@ class NonTenantProfileListAPIView(generics.ListAPIView):
             .exclude(user__is_superuser=True)
             .exclude(occupation=Profile.Occupation.TENANT)
         )
-
