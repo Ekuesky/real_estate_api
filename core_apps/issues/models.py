@@ -1,19 +1,21 @@
+# Import necessary modules
 import logging
-
 from django.contrib.auth import get_user_model
+from django.core.mail import EmailMultiAlternatives
 from django.db import models
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django.utils.translation import gettext_lazy as _
-
+from config.settings.local import SITE_NAME, DEFAULT_FROM_EMAIL
 from core_apps.apartments.models import Apartment
 from core_apps.common.models import TimeStampedModel
 
-
+# Get the user model and set up logging
 User = get_user_model()
-
 logger = logging.getLogger(__name__)
 
-
 class Issue(TimeStampedModel):
+    # Define choices for issue status and priority
     class IssueStatus(models.TextChoices):
         REPORTED = ("reported", _("Reported"))
         RESOLVED = ("resolved", _("Resolved"))
@@ -24,6 +26,7 @@ class Issue(TimeStampedModel):
         MEDIUM = ("medium", _("Medium"))
         HIGH = ("high", _("High"))
 
+    # Model fields
     apartment = models.ForeignKey(
         Apartment,
         on_delete=models.CASCADE,
@@ -62,3 +65,50 @@ class Issue(TimeStampedModel):
 
     def __str__(self) -> str:
         return self.title
+
+    def save(self, *args, **kwargs) -> None:
+        # Check if this is an existing instance
+        is_existing_instance = self.pk is not None
+        old_assigned_to = None
+
+        # If it's an existing issue, get the old assigned_to user
+        if is_existing_instance:
+            old_issue = Issue.objects.get(pk=self.pk)
+            old_assigned_to = old_issue.assigned_to
+
+        # Call the parent class's save method
+        super().save(*args, **kwargs)
+
+        # If the issue already exist and is assigned to non None new user, notify the new user
+        if (
+            is_existing_instance
+            and self.assigned_to != old_assigned_to
+            and self.assigned_to is not None
+        ):
+            self.notify_assigned_user()
+
+    def notify_assigned_user(self) -> None:
+        try:
+            # Prepare email details
+            subject = f"New Issue Assigned: {self.title}"
+            from_email = DEFAULT_FROM_EMAIL
+            recipient_list = [self.assigned_to.email]
+            context = {"issue": self, "site_name": SITE_NAME}
+
+            # Render email templates
+            html_email = render_to_string(
+                "emails/issue_assignment_notification.html", context
+            )
+            text_email = strip_tags(html_email)
+
+            # Create and send the email
+            email = EmailMultiAlternatives(
+                subject, text_email, from_email, recipient_list
+            )
+            email.attach_alternative(html_email, "text/html")
+            email.send()
+        except Exception as e:
+            # Log any errors that occur during email sending
+            logger.error(
+                f"Failed to send issue assignment email for issue '{self.title}':{e}"
+            )
