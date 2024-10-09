@@ -4,7 +4,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
-from config.settings.local import SITE_NAME, DEFAULT_FROM_EMAIL  # Import settings for site name and default email
+from backend.settings.local import SITE_NAME, DEFAULT_FROM_EMAIL  # Import settings for site name and default email
 
 from .models import Issue  # Import the Issue model
 

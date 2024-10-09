@@ -49,7 +49,7 @@ LOCAL_APPS = [
     "core_apps.users",
     "core_apps.profiles",
     "core_apps.apartments",
-    # "core_apps.issues",
+    "core_apps.issues",
     # "core_apps.reports",
     # "core_apps.posts",
     # "core_apps.ratings",

@@ -1,13 +1,30 @@
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
-from core_apps.common.admin import ContentViewInline  # Import the inline admin class for ContentViews
-from core_apps.common.models import ContentView  # Import the ContentView model
-from .models import Issue  # Import the Issue model
+from core_apps.common.admin import ContentViewInline
+from core_apps.common.models import ContentView
+from .models import Issue
+from core_apps.users.models import User
+from django.db.models import Q
+from django.forms import ModelForm  # Import ModelForm
 
-# Register the Issue model with the admin interface
+class IssueForm(ModelForm):  # Create a custom form class
+    class Meta:
+        model = Issue
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Customize 'assigned_to' queryset (Filter in the Form)
+        self.fields["assigned_to"].queryset = User.objects.exclude(
+            Q(is_superuser=True) | Q(profile__occupation="tenant") | Q(is_active=False)
+        )
+        # Customize 'reported_by' queryset (Filter in the Form)
+        self.fields["reported_by"].queryset = User.objects.filter(
+            Q(is_active=True) & (Q(is_superuser=True) | Q(is_staff=True) | Q(profile__occupation__iexact="tenant"))
+        )
+
 @admin.register(Issue)
 class IssueAdmin(admin.ModelAdmin):
-    # Define the fields to display in the list view
     list_display = [
         "id",
         "apartment",
@@ -15,36 +32,20 @@ class IssueAdmin(admin.ModelAdmin):
         "assigned_to",
         "status",
         "priority",
-        "get_total_views",  # Add a custom method to display the total views
+        "get_total_views",
     ]
-
-    # Define the fields that are clickable links in the list view
     list_display_links = ["id", "apartment"]
-
-    # Define the fields to filter the list view by
     list_filter = ["status", "priority"]
-
-    # Define the fields to search within the list view
     search_fields = ["apartment__unit_number", "reported_by__first_name"]
-
-    # Define the default ordering of the list view
     ordering = ["-created_at"]
-
-    # Define the fields that use autocomplete for easy selection
-    autocomplete_fields = ["apartment", "reported_by", "assigned_to"]
-
-    # Add the ContentViewInline class to display ContentViews related to each Issue
+    autocomplete_fields = ["apartment"]
     inlines = [ContentViewInline]
-
-    # Custom method to retrieve the total views for an Issue
+    form = IssueForm  # use the custom form
     def get_total_views(self, obj):
-        # Get the ContentType instance for the Issue model
         content_type = ContentType.objects.get_for_model(obj)
-        # Filter ContentView objects based on content_type and object_id
         views = ContentView.objects.filter(
-            content_type=content_type, object_id=obj.pkid  # Use pkid instead of pk
+            content_type=content_type, object_id=obj.pkid
         ).count()
         return views
 
-    # Set the short description for the custom method in the list view
     get_total_views.short_description = "Total Views"
