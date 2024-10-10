@@ -4,7 +4,6 @@ import cloudinary
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-
 SITE_NAME = getenv("SITE_NAME")
 
 SECRET_KEY = getenv(

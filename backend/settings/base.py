@@ -10,7 +10,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 APPS_DIR = os.path.join(BASE_DIR, "core_apps")
 
-
 local_env_file = path.join(BASE_DIR, ".envs", ".env.local")
 
 if path.isfile(local_env_file):
@@ -21,6 +20,8 @@ if path.isfile(local_env_file):
 # Application definition
 
 DJANGO_APPS = [
+    "admin_interface",
+    "colorfield",
     "whitenoise.runserver_nostatic",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -56,6 +57,9 @@ LOCAL_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+X_FRAME_OPTIONS = "SAMEORIGIN"              # allows you to use modals insated of popups
+SILENCED_SYSTEM_CHECKS = ["security.W019"]  # ignores redundant warning messages
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

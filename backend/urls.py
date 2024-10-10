@@ -4,6 +4,7 @@ from django.urls import include, path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
+from django.conf.urls.static import static
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -33,7 +34,9 @@ urlpatterns = [
     # path("api/v1/ratings/", include("core_apps.ratings.urls")),
     # path("api/v1/posts/", include("core_apps.posts.urls")),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-admin.site.site_header = "RealEstate Apartments Admin"
+admin.site.site_header = "Real Estate"
 admin.site.site_title = "RealEstate Apartments Admin Portal"
 admin.site.index_title = "Welcome to real estate Apartments Admin Portal"

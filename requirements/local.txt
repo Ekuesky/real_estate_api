@@ -1,4 +1,4 @@
-django
+django==4.2.11
 django-environ
 djangorestframework
 django-cors-headers
@@ -33,3 +33,4 @@ pytest-django==4.5.2
 pytest-factoryboy==2.5.1
 Faker==18.3.1
 pytest-cov==4.0.0
+django-admin-interface

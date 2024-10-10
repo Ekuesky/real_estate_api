@@ -10,8 +10,21 @@ User = get_user_model()
 class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
-    verbose_name_plural = 'Profiles'
+    verbose_name_plural = 'Profile'
     fk_name = 'user'
+    readonly_fields = ['avatar_preview', 'slug', ]
+
+    def avatar_preview(self, instance):
+        if instance.avatar:
+            return format_html('<img src="{}" width="300" height="300" style="object-fit: cover;" />', instance.avatar.url)
+        return "No avatar"
+    avatar_preview.short_description = "Preview"
+
+    fieldsets = (
+        ('', {'fields': ('avatar_preview', 'avatar')}),
+        ('', {'fields': ('gender', 'occupation', 'bio', 'phone_number', 'country_of_origin','city_of_origin','report_count',
+                         'reputation', 'slug')}),
+    )
 
 
 @admin.register(User)
@@ -42,7 +55,7 @@ class UserAdmin(BaseUserAdmin):
         if instance.profile.avatar:
             width, height = 80, 100  # Set desired width and height
             return format_html(
-                '<img src="{}" width="{}" height="{}" />',  # No leading slash
+                '<img src="{}" width="{}" height="{}" style="border-radius: 50%;" />',  # No leading slash
                 instance.profile.avatar.url, width, height
             )
         return None
@@ -94,3 +107,4 @@ class UserAdmin(BaseUserAdmin):
         if not obj:
             return list()
         return super(UserAdmin, self).get_inline_instances(request, obj)
+
