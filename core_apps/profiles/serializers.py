@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import Profile
 from django_countries.serializer_fields import  CountryField
+from core_apps.apartments.serializers import ApartmentSerializer
 
 User = get_user_model()
 
@@ -13,7 +14,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     country_of_origin = CountryField(name_only=True)
     avatar = serializers.SerializerMethodField()
     date_joined = serializers.DateTimeField(source="user.date_joined", read_only=True)
-    #apartement = serializers.SerializerMethodField()
+    apartments = serializers.SerializerMethodField()
 
     class Meta:
         model = Profile
@@ -32,7 +33,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             "reputation",
             "date_joined",
             "avatar",
-            #"apartment",
+            "apartments",
             # "average_rating",
         ]
 
@@ -42,11 +43,11 @@ class ProfileSerializer(serializers.ModelSerializer):
         except AttributeError:
             return None
 
-    # def get_apartment(self, obj: Profile) -> None:
-    #     apartment = obj.user.apartment.first()
-    #     if apartment:
-    #         return ApartmentSerializer(apartment).data
-    #     return None
+    def get_apartments(self, obj: Profile) -> list|None:
+        apartments = obj.user.apartments.all()
+        if apartments:
+            return ApartmentSerializer(apartments, many=True).data
+        return None
 
 class UpdateProfileSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source="user.first_name")

@@ -10,7 +10,6 @@ from core_apps.profiles.models import Profile
 
 logger = logging.getLogger(__name__)
 
-
 @receiver(post_save, sender=AUTH_USER_MODEL)
 def create_user_profile(
     sender: Type[Model], instance: Model, created: bool, **kwargs: Any

@@ -42,7 +42,6 @@ class ProfileListAPIView(generics.ListAPIView):
             .filter(occupation=Profile.Occupation.TENANT)
         )
 
-
 class ProfileDetailAPIView(generics.RetrieveAPIView):
     serializer_class = ProfileSerializer
     renderer_classes = [GenericJSONRenderer]
@@ -60,7 +59,7 @@ class ProfileDetailAPIView(generics.RetrieveAPIView):
             raise Http404("Profile not found")
 
 
-class ProfileUpdateAPIView(generics.RetrieveUpdateAPIView):
+class ProfileUpdateAPIView(generics.UpdateAPIView):
     serializer_class = UpdateProfileSerializer
     renderer_classes = [GenericJSONRenderer]
     object_label = "profile"

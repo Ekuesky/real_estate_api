@@ -112,3 +112,4 @@ class Issue(TimeStampedModel):
             logger.error(
                 f"Failed to send issue assignment email for issue '{self.title}':{e}"
             )
+

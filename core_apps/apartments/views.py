@@ -16,22 +16,26 @@ class ApartmentCreateAPIview(generics.CreateAPIView):
 
     def create(self, request:Request, *args:Any, **kwargs:Any):
         user = request.user
-        if user.is_superuser or (hasattr(user,profile) and user.profile.occupation == Profile.Occupation.TENANT):
+        if user.is_superuser or user.is_staff or (hasattr(user,profile) and user.profile.occupation == Profile.Occupation.TENANT):
             return super().create(request, *args, **kwargs)
         else:
-            return Response({"message": _("Only tenants, superusers or staff members can create apartments.")}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"message": _("Only superusers or staff members can create apartments.")}, status=status.HTTP_403_FORBIDDEN)
 
 
-class ApartmentDetailsView(generics.RetrieveAPIView):
+class ApartmentDetailsView(generics.ListAPIView):
     renderer_classes = (GenericJSONRenderer,)
     serializer_class = ApartmentSerializer
-    object_label = "apartment"
+    object_label = "apartments"
 
-    def get_object(self)->Apartment:
-        query = self.request.user.apartment.all()
-        if query:
-            obj = generics.get_object_or_404(query)
-            return obj
+    def get_queryset(self):
+        return Apartment.objects.filter(tenant=self.request.user)
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        if not queryset.exists():
+            return Response({"detail": "No apartments found for this user."}, status=status.HTTP_404_NOT_FOUND)
+        serializer = self.get_serializer(queryset, many=True, context={'request': request})
+        return Response({'data': serializer.data})
+
 
 
 

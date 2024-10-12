@@ -1,22 +1,95 @@
-# Cours avancé sur la personnalisation de l'administration Django
+# Cours avancé détaillé sur la personnalisation de l'administration Django
+
+## Introduction
+
+Avant de plonger dans les détails de la personnalisation de l'administration Django, définissons d'abord le modèle que nous allons utiliser tout au long de ce cours. Cela nous donnera un contexte clair pour tous nos exemples.
+
+## Définition du modèle
+
+Nous allons travailler avec un modèle `Product` qui représente des produits dans une boutique en ligne. Voici la définition du modèle :
+
+```python
+from django.db import models
+from django.core.validators import MinValueValidator
+
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "Categories"
+
+class Product(models.Model):
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('inactive', 'Inactive'),
+        ('pending', 'Pending'),
+    ]
+
+    name = models.CharField(max_length=200)
+    description = models.TextField()
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    cost = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    stock = models.PositiveIntegerField(default=0)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='products')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+    def update_stock(self):
+        # Logique pour mettre à jour le stock
+        pass
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='products/')
+    is_primary = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Image for {self.product.name}"
+```
+
+Maintenant que nous avons défini notre modèle, passons à la personnalisation de l'administration Django.
 
 ## 1. Personnalisation des modèles d'administration
 
 ### 1.1 Création de classes ModelAdmin avancées
 
-Pour commencer, créons une classe ModelAdmin avancée :
+La classe `ModelAdmin` est le cœur de la personnalisation de l'interface d'administration pour un modèle spécifique. Voici une classe `ProductAdmin` avancée avec des explications détaillées :
 
 ```python
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Product
+from .models import Product, Category
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'stock', 'colored_status')
+    list_display = ('name', 'price', 'stock', 'colored_status', 'category')
     list_filter = ('status', 'category')
     search_fields = ('name', 'description')
-    readonly_fields = ('created_at',)
+    readonly_fields = ('created_at', 'updated_at')
+    fieldsets = (
+        ('Informations de base', {
+            'fields': ('name', 'description', 'category')
+        }),
+        ('Détails du prix', {
+            'fields': ('price', 'cost'),
+            'classes': ('collapse',)
+        }),
+        ('Inventaire', {
+            'fields': ('stock', 'status')
+        }),
+        ('Métadonnées', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
     
     def colored_status(self, obj):
         colors = {
@@ -34,11 +107,31 @@ class ProductAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.select_related('category')
+
+# N'oubliez pas d'enregistrer aussi le modèle Category
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'product_count')
+    search_fields = ('name', 'description')
+
+    def product_count(self, obj):
+        return obj.products.count()
+    product_count.short_description = 'Nombre de produits'
 ```
+
+Explications :
+
+- `list_display` : Définit les champs à afficher dans la liste des produits.
+- `list_filter` : Ajoute des filtres dans la barre latérale pour filtrer les produits.
+- `search_fields` : Permet de rechercher des produits par nom ou description.
+- `readonly_fields` : Empêche la modification de certains champs.
+- `fieldsets` : Organise les champs dans le formulaire d'édition en sections.
+- `colored_status` : Méthode personnalisée pour afficher le statut avec une couleur.
+- `get_queryset` : Optimise les requêtes en utilisant `select_related`.
 
 ### 1.2 Personnalisation des formulaires d'administration
 
-Utilisons une classe de formulaire personnalisée :
+Pour un contrôle plus fin sur le formulaire d'édition, nous pouvons créer une classe de formulaire personnalisée :
 
 ```python
 from django import forms
@@ -58,15 +151,29 @@ class ProductAdminForm(forms.ModelForm):
             raise forms.ValidationError("Le prix ne peut pas être négatif.")
         return price
 
+    def clean(self):
+        cleaned_data = super().clean()
+        price = cleaned_data.get('price')
+        cost = cleaned_data.get('cost')
+        if price and cost and price < cost:
+            raise forms.ValidationError("Le prix de vente ne peut pas être inférieur au coût.")
+        return cleaned_data
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     form = ProductAdminForm
     # ... autres configurations ...
 ```
 
+Explications :
+
+- Nous personnalisons le widget du champ `description` pour qu'il utilise un `Textarea` plus grand.
+- La méthode `clean_price` effectue une validation spécifique pour le champ `price`.
+- La méthode `clean` effectue une validation au niveau du formulaire, comparant le prix et le coût.
+
 ## 2. Actions personnalisées
 
-Ajoutons des actions personnalisées à notre modèle d'administration :
+Les actions personnalisées permettent d'effectuer des opérations sur plusieurs objets à la fois :
 
 ```python
 from django.contrib import admin, messages
@@ -93,11 +200,19 @@ class ProductAdmin(admin.ModelAdmin):
         self.message_user(request, "Le stock a été mis à jour.", messages.SUCCESS)
 ```
 
+Explications :
+
+- Chaque action est une méthode de la classe `ModelAdmin`.
+- `make_active` et `make_inactive` utilisent `queryset.update()` pour modifier efficacement plusieurs objets.
+- `update_stock` appelle une méthode sur chaque objet individuellement.
+- `self.message_user()` affiche un message à l'utilisateur après l'action.
+- Le décorateur `@admin.action` est une alternative à la définition manuelle de `short_description`.
+
 ## 3. Personnalisation de l'interface utilisateur
 
 ### 3.1 Modification du template d'administration
 
-Créez un fichier `templates/admin/base_site.html` dans votre projet :
+Pour personnaliser l'apparence globale de l'administration, créez un fichier `templates/admin/base_site.html` :
 
 ```html
 {% extends "admin/base.html" %}
@@ -126,9 +241,15 @@ Créez un fichier `templates/admin/base_site.html` dans votre projet :
 {% endblock %}
 ```
 
+Explications :
+
+- Ce template étend le template de base de l'administration Django.
+- Nous ajoutons un logo personnalisé dans l'en-tête.
+- Des styles CSS personnalisés sont ajoutés pour modifier les couleurs.
+
 ### 3.2 Ajout de JavaScript personnalisé
 
-Créez un fichier `static/admin/js/custom_admin.js` :
+Pour ajouter des fonctionnalités JavaScript, créez un fichier `static/admin/js/custom_admin.js` :
 
 ```javascript
 (function($) {
@@ -143,6 +264,11 @@ Créez un fichier `static/admin/js/custom_admin.js` :
                 });
             }
         });
+
+        // Exemple : Masquer le champ 'cost' pour les non-superutilisateurs
+        if (!$('body').hasClass('superuser')) {
+            $('.field-cost').hide();
+        }
     });
 })(django.jQuery);
 ```
@@ -155,40 +281,66 @@ class ProductAdmin(admin.ModelAdmin):
         js = ('admin/js/custom_admin.js',)
 ```
 
+Explications :
+
+- Le script ajoute une confirmation avant la suppression d'éléments.
+- Il cache également le champ 'cost' pour les utilisateurs qui ne sont pas superutilisateurs.
+- La classe `Media` dans `ModelAdmin` permet d'inclure des fichiers JS et CSS spécifiques.
+
 ## 4. Personnalisation avancée des listes et des formulaires
 
 ### 4.1 Personnalisation des champs de liste
 
 ```python
-from django.db.models import Sum, F
+from django.db.models import Sum, F, ExpressionWrapper, DecimalField
 from django.contrib import admin
 from .models import Product
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'stock', 'total_value')
+    list_display = ('name', 'price', 'stock', 'total_value', 'margin', 'margin_percentage')
     list_editable = ('price', 'stock')
     
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs.annotate(total_value=F('price') * F('stock'))
+        return qs.annotate(
+            total_value=ExpressionWrapper(F('price') * F('stock'), output_field=DecimalField()),
+            margin=ExpressionWrapper(F('price') - F('cost'), output_field=DecimalField()),
+            margin_percentage=ExpressionWrapper(
+                (F('price') - F('cost')) * 100 / F('price'),
+                output_field=DecimalField()
+            )
+        )
     
     def total_value(self, obj):
         return obj.total_value
     total_value.admin_order_field = 'total_value'
     
+    def margin(self, obj):
+        return obj.margin
+    margin.admin_order_field = 'margin'
+    
+    def margin_percentage(self, obj):
+        return f"{obj.margin_percentage:.2f}%"
+    margin_percentage.admin_order_field = 'margin_percentage'
+    
     def get_list_display(self, request):
         list_display = list(super().get_list_display(request))
-        if request.user.is_superuser:
-            list_display.append('margin')
+        if not request.user.is_superuser:
+            list_display.remove('margin')
+            list_display.remove('margin_percentage')
         return list_display
-    
-    def margin(self, obj):
-        return obj.price - obj.cost
-    margin.short_description = 'Marge'
 ```
 
+Explications :
+
+- Nous utilisons `annotate` dans `get_queryset` pour ajouter des champs calculés à notre queryset.
+- Les méthodes `total_value`, `margin`, et `margin_percentage` affichent ces valeurs calculées.
+- `get_list_display` personnalise les champs affichés en fonction du type d'utilisateur.
+
 ### 4.2 Inlines personnalisés
+
+Les inlines permettent d'éditer des modèles liés directement dans le formulaire du modèle parent :
 
 ```python
 from django.contrib import admin
@@ -207,78 +359,16 @@ class ProductImageInline(admin.TabularInline):
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     inlines = [ProductImageInline]
+
+    def get_inline_instances(self, request, obj=None):
+        if not obj:  # Pas d'inlines sur la page d'ajout
+            return []
+        return super().get_inline_instances(request, obj)
 ```
 
-## 5. Personnalisation des permissions et du contrôle d'accès
+Explications :
 
-```python
-from django.contrib import admin
-from django.contrib.auth import get_permission_codename
-from .models import Product
-
-@admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
-    def has_change_permission(self, request, obj=None):
-        if obj is not None and obj.status == 'active':
-            return request.user.has_perm('myapp.change_active_product')
-        return super().has_change_permission(request, obj)
-    
-    def get_readonly_fields(self, request, obj=None):
-        if not request.user.is_superuser and obj is not None:
-            return self.readonly_fields + ('price',)
-        return self.readonly_fields
-    
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        if request.user.is_superuser:
-            return qs
-        return qs.filter(category__in=request.user.allowed_categories.all())
-```
-
-## 6. Personnalisation du dashboard d'administration
-
-Créez un fichier `admin.py` au niveau du projet :
-
-```python
-from django.contrib import admin
-from django.contrib.admin.apps import AdminConfig
-
-class CustomAdminSite(admin.AdminSite):
-    site_header = "Mon Administration Personnalisée"
-    site_title = "Portail d'Administration"
-    index_title = "Bienvenue dans l'Administration"
-    
-    def get_app_list(self, request):
-        app_list = super().get_app_list(request)
-        app_list += [
-            {
-                "name": "Rapports",
-                "app_label": "rapports",
-                "models": [
-                    {
-                        "name": "Rapport de ventes",
-                        "object_name": "sales_report",
-                        "admin_url": "/admin/rapports/sales/",
-                        "view_only": True,
-                    },
-                ],
-            }
-        ]
-        return app_list
-
-class CustomAdminConfig(AdminConfig):
-    default_site = 'myproject.admin.CustomAdminSite'
-```
-
-Mettez à jour `INSTALLED_APPS` dans `settings.py` :
-
-```python
-INSTALLED_APPS = [
-    'myproject.admin.CustomAdminConfig',
-    # ... autres apps ...
-]
-```
-
-## Conclusion
-
-Ce cours avancé couvre de nombreux aspects de la personnalisation de l'administration Django. Il vous permet de créer une interface d'administration sur mesure, adaptée aux besoins spécifiques de votre projet. N'oubliez pas que la personnalisation doit toujours être équilibrée avec la maintenabilité et la lisibilité du code.
+- `ProductImageInline` permet d'ajouter et d'éditer des images directement dans le formulaire du produit.
+- `extra = 1` ajoute un formulaire vide pour une nouvelle image.
+- `max_num = 5` limite le nombre d'images à 5.
+- `get_formset` personnalise le widget du champ image pour n'accepter que des

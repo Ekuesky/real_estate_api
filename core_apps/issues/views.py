@@ -156,6 +156,16 @@ class IssueUpdateAPIView(generics.UpdateAPIView):
                 f"Unauthorized issue status update attempt by user {user.get_full_name} on issue {issue.title}"
             )  # Log unauthorized update attempts
             raise PermissionDenied("You do not have permission to update the issue")
+        if not (user.is_staff or user == issue.assigned_to):
+            logger.warning(
+                f"Unauthorized issue status update attempt by user {user.get_full_name} on issue {issue.title}"
+            )  # Log unauthorized update attempts
+            raise PermissionDenied("You do not have permission to update the issue")
+        if not (issue.status == Issue.IssueStatus.RESOLVED):
+            logger.warning(
+                f"Unauthorized issue status update attempt by user {user.get_full_name} on issue {issue.title}"
+            )  # Log unauthorized update attempts
+            raise PermissionDenied("Issue already resolved")
         send_issue_resolved_email(issue)  # Send a resolution email if the status is updated to RESOLVED
         return issue
 

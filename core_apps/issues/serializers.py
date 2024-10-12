@@ -61,6 +61,11 @@ class IssueStatusUpdateSerializer(serializers.ModelSerializer):
             "resolved_by",
             "resolved_on",
         ]
+    def validate_status(self, value):
+        # Check if the issue is already resolved
+        if self.instance and self.instance.status == Issue.IssueStatus.RESOLVED:
+            raise serializers.ValidationError("Cannot update a resolved issue.")
+        return value
 
     # Override the update method to handle status changes
     def update(self, instance: Issue, validated_data: dict) -> Issue:
