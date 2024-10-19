@@ -5,11 +5,13 @@ from django.utils.translation import gettext_lazy as _
 from .forms import UserChangeForm, UserCreationForm
 from core_apps.profiles.models import Profile
 from django.utils.html import  format_html
+from .forms import ProfileForm
 
 User = get_user_model()
 class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
+    form = ProfileForm
     verbose_name_plural = 'Profile'
     fk_name = 'user'
     readonly_fields = ['avatar_preview', 'slug', ]
@@ -53,7 +55,7 @@ class UserAdmin(BaseUserAdmin):
 
     def avatar(self, instance):
         if instance.profile.avatar:
-            width, height = 80, 100  # Set desired width and height
+            width, height = 80, 80  # Set desired width and height
             return format_html(
                 '<img src="{}" width="{}" height="{}" style="border-radius: 50%;" />',  # No leading slash
                 instance.profile.avatar.url, width, height

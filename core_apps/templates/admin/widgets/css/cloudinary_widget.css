@@ -1,0 +1,33 @@
+.cloudinary-file-widget {
+    margin: 10px 0;
+}
+
+.current-file {
+    margin-bottom: 10px;
+}
+
+.preview-image {
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: cover;
+    margin-bottom: 5px;
+}
+
+.upload-options {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.cloudinary-button {
+    background: #417690;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.cloudinary-button:hover {
+    background: #2b5173;
+}

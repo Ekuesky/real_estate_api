@@ -42,6 +42,7 @@ THIRD_PARTY_APPS = [
     "taggit",
     "django_filters",
     "djcelery_email",
+    #"cloudinary",
     "django_celery_beat",
 ]
 

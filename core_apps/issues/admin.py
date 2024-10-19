@@ -6,6 +6,8 @@ from .models import Issue
 from core_apps.users.models import User
 from django.db.models import Q
 from django.forms import ModelForm  # Import ModelForm
+from .emails import send_resolution_email
+from django.utils import timezone
 
 class IssueForm(ModelForm):  # Create a custom form class
     class Meta:
@@ -40,6 +42,7 @@ class IssueAdmin(admin.ModelAdmin):
     ordering = ["-created_at"]
     autocomplete_fields = ["apartment"]
     inlines = [ContentViewInline]
+    readonly_fields = []
     form = IssueForm  # use the custom form
     def get_total_views(self, obj):
         content_type = ContentType.objects.get_for_model(obj)
@@ -47,5 +50,17 @@ class IssueAdmin(admin.ModelAdmin):
             content_type=content_type, object_id=obj.pkid
         ).count()
         return views
+    def save_model(self, request, obj, form, change):
+        if 'status' in form.changed_data:
+            if obj.status == Issue.IssueStatus.RESOLVED and form.initial['status'] != Issue.IssueStatus.RESOLVED:
+                obj.resolved_on = timezone.now().date()
+                obj.resolved_by = request.user
+                send_resolution_email(obj)
+        super().save_model(request, obj, form, change)
+
+    # def get_readonly_fields(self, request, obj=None):
+    #     if obj:  # editing an existing object
+    #         return self.readonly_fields + ['reported_by']
+    #     return self.readonly_fields
 
     get_total_views.short_description = "Total Views"

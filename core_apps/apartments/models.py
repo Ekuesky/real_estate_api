@@ -20,5 +20,10 @@ class Apartment(TimeStampedModel):
         verbose_name=_("Tenant"),
     )
 
+    class Meta:
+        verbose_name = _("Apartment")
+        verbose_name_plural = _("Apartments")
+        ordering = ["-created_at"]
+        unique_together = ("building", "floor","unit_number")
     def __str__(self) -> str:
         return f"Unit: {self.unit_number} -  Building: {self.building} - Floor: {self.floor}"
