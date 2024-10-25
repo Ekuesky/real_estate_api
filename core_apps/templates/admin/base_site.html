@@ -13,4 +13,40 @@
 {% block extrahead %}
 {{ block.super }}
 <link rel="shortcut icon" href="{% static 'admin/img/real-estate.ico' %}" />
+    <style>
+    #header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .sticky-sidebar {
+        position: sticky;
+        top: 70px; /* Adjust based on your header height */
+        height: calc(100vh - 70px);
+        overflow-y: auto;
+    }
+    #changelist-filter {
+        position: sticky;
+        top: 70px;
+        max-height: calc(100vh - 70px);
+        overflow-y: auto;
+    }
+    /* Optional: Add smooth shadow when scrolling */
+    #header.scrolled {
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 20) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
+});
+</script>
 {% endblock %}
