@@ -20,11 +20,12 @@ if path.isfile(local_env_file):
 # Application definition
 
 DJANGO_APPS = [
-    "admin_interface",
+    "backend.settings.custom_app.CustomAdminInterfaceConfig",
     "colorfield",
     "whitenoise.runserver_nostatic",
     "django.contrib.admin",
-    "django.contrib.auth",
+    #"django.contrib.auth",
+    "backend.settings.custom_app.CustomAuthConfig", # this replaces django.contrib.auth
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
@@ -43,6 +44,7 @@ THIRD_PARTY_APPS = [
     "django_filters",
     "djcelery_email",
     "django_celery_beat",
+
 ]
 
 LOCAL_APPS = [
@@ -304,3 +306,9 @@ AUTHENTICATION_BACKENDS = [
     "social_core.backends.google.GoogleOAuth2", # Google OAuth
     "django.contrib.auth.backends.ModelBackend", #default
 ]
+
+ADMIN_INTERFACE_CONFIG = {
+    'APPS_VERBOSE_NAMES': {
+        'admin_interface': 'Site Settings'  # Replace 'Site Settings' with your desired name
+    }
+}

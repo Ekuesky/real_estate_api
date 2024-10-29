@@ -8,6 +8,7 @@ django-phonenumber-field
 phonenumbers
 drf-yasg
 Pillow
+django-admin-tailwind
 argon2-cffi
 python-dotenv
 pytz

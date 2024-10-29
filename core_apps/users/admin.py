@@ -7,10 +7,33 @@ from core_apps.profiles.models import Profile
 from django.utils.html import  format_html
 
 User = get_user_model()
+
+
+class OccupationFilter(admin.SimpleListFilter):
+    title = _('Occupation')
+    parameter_name = 'occupation'
+
+    def lookups(self, request, model_admin):
+        # Get distinct occupations and sort them alphabetically
+        occupations = Profile.objects.exclude(
+            occupation__isnull=True
+        ).exclude(
+            occupation__exact=''
+        ).values_list(
+            'occupation', flat=True
+        ).distinct().order_by('occupation')
+
+        # Convert to list of tuples for admin interface
+        return [(str(occupation), str(occupation)) for occupation in occupations]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(profile__occupation=self.value())
+        return queryset
 class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
-    verbose_name_plural = 'Profile'
+    verbose_name_plural  = 'User Profile'
     fk_name = 'user'
     readonly_fields = ['avatar_preview', 'slug', ]
 
@@ -32,6 +55,11 @@ class UserAdmin(BaseUserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
     inlines = (ProfileInline,)
+    list_filter = ('is_superuser', 'is_active', OccupationFilter)
+    # Pagination settings
+    list_per_page = 3  # Nombre d'éléments par page
+    list_max_show_all = 1000  # Nombre maximum d'éléments quand "Show all" est cliqué
+    show_full_result_count = True  # Afficher le nombre total d'éléments
 
     list_display = [
         "pkid",
@@ -103,6 +131,9 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
     )
+
+    # filter user list by occupation
+
     def get_inline_instances(self, request, obj=None):
         if not obj:
             return list()
