@@ -229,6 +229,7 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "SIGNING_KEY": getenv("SIGNING_KEY"),
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    #"ACCESS_TOKEN_LIFETIME": timedelta(seconds=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
     "USER_ID_FIELD": "id",
@@ -258,10 +259,10 @@ DJOSER = {
     # Oblige l'utilisateur à saisir deux fois le nouveau mot de passe lors de la réinitialisation
     "PASSWORD_RESET_CONFIRM_RETYPE": True,
 
-    # URL pour l'activation du compte (à compléter côté frontend)
+    # URL pour l'activation du compte
     "ACTIVATION_URL": "activate/{uid}/{token}",
 
-    # URL pour la confirmation de réinitialisation du mot de passe (à compléter côté frontend)
+    # URL pour la confirmation de réinitialisation du mot de passe
     "PASSWORD_RESET_CONFIRM_URL": "password-reset/{uid}/{token}",
 
     # Liste des URIs autorisés pour la redirection après authentification sociale
