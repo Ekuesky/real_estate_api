@@ -104,6 +104,6 @@ class Profile(TimeStampedModel):
         self.update_reputation()
         super().save(*args, **kwargs)
 
-    # def get_average_rating(self):
-    #     average = self.user.received_ratings.aggregate(Avg("rating"))["rating__avg"]
-    #     return average if average is not None else 0.0
+    def get_average_rating(self):
+        average = self.user.received_ratings.aggregate(Avg("rating"))["rating__avg"]
+        return average if average is not None else 0.0

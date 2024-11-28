@@ -57,7 +57,7 @@ class UserAdmin(BaseUserAdmin):
     inlines = (ProfileInline,)
     list_filter = ('is_superuser', 'is_active', OccupationFilter)
     # Pagination settings
-    list_per_page = 3  # Nombre d'éléments par page
+    list_per_page = 5  # Nombre d'éléments par page
     list_max_show_all = 1000  # Nombre maximum d'éléments quand "Show all" est cliqué
     show_full_result_count = True  # Afficher le nombre total d'éléments
 

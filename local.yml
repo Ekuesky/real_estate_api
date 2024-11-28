@@ -8,7 +8,7 @@ services:
     container_name: estate_api
     volumes:
       - .:/app:z
-      - ./staticfiles:/app/staticfiles
+      - ./staticfiles:/app/staticfiles # volume bind mount, lie directement un dossier local au conteneur
 #    ports:
 #      - "8000:8000"
     expose:
@@ -32,7 +32,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - estate_postgres_data:/var/lib/postgresql/data
+      - estate_postgres_data:/var/lib/postgresql/data # Volume nommé : Géré par Docker, stocké dans l'espace Docker
     env_file:
       - ./.envs/.env.local
     networks:
@@ -112,8 +112,8 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./staticfiles:/app/staticfiles
-      - logs_store:/var/log/nginx
+      - ./staticfiles:/app/staticfiles # volume de type bind mount, lie directement un dossier local au conteneur
+      - logs_store:/var/log/nginx # volume nommé : Géré par Docker, stocké dans l'espace Docker
     depends_on:
       - api
     networks:
