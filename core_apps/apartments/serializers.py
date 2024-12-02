@@ -1,12 +1,14 @@
+import uuid
+
 from rest_framework import serializers
 from .models import Apartment
+
 
 
 class ApartmentSerializer(serializers.ModelSerializer):
     # Le champ 'tenant' est caché, ne sera pas inclus dans la réponse JSON
     # et sera automatiquement rempli par le champ 'current_user' de Django REST Framework.
     tenant = serializers.HiddenField(default=serializers.CurrentUserDefault())
-
     class Meta:
         model = Apartment
         exclude = ["pkid", "updated_at"]
@@ -23,3 +25,15 @@ class ApartmentSerializer(serializers.ModelSerializer):
             for field in sensitive_fields:
                 representation.pop(field, None)
         return representation
+
+class UpdateApartmentSerializer(serializers.ModelSerializer):
+
+    tenant = serializers.UUIDField(default=uuid.uuid4, required=False,allow_null= False)
+    class Meta:
+        model = Apartment
+        fields = ["unit_number", "building", "floor","tenant"]
+        read_only_fields = ["unit_number", "building", "floor" ]
+
+
+
+
