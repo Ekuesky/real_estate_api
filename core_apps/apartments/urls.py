@@ -5,7 +5,7 @@ from .views import ApartmentCreateAPIview, ApartmentDetailsView, ApartmentListAP
 urlpatterns = [
     path("", ApartmentCreateAPIview.as_view(), name="apartment-create"),
     path("me/", ApartmentDetailsView.as_view(), name="apartment-details"),
-    path("freed/", ApartmentListAPIView.as_view(), name="apartment-non-assigned"),
+    path("available/", ApartmentListAPIView.as_view(), name="apartment-non-assigned"),
     path('<uuid:apartment_id>/release/', ApartmentReleaseView.as_view(), name='apartment-release'),
     path('<uuid:apartment_id>/assign/', ApartmentAssignView.as_view(), name='apartment-assign'),
 ]
