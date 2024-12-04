@@ -13,7 +13,7 @@ from .models import Apartment
 from rest_framework.response import Response
 from rest_framework.request import Request
 from core_apps.common.renderers import GenericJSONRenderer
-from rest_framework.permissions import IsAuthenticated, IsAdminUser  # More concise
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny  # More concise
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
 User = get_user_model()
@@ -24,6 +24,7 @@ User = get_user_model()
 class ApartmentListAPIView(generics.ListAPIView):
     renderer_classes = (GenericJSONRenderer,)
     serializer_class = ApartmentSerializer
+    permission_classes = (AllowAny,)
     object_label = "apartments"
 
     def get_queryset(self):
