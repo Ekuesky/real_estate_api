@@ -3,8 +3,6 @@ import uuid
 from rest_framework import serializers
 from .models import Apartment
 
-
-
 class ApartmentSerializer(serializers.ModelSerializer):
     #tenant = serializers.HiddenField(default=serializers.CurrentUserDefault())
     tenant = serializers.HiddenField(default=None)

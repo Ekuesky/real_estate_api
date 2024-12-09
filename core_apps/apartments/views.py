@@ -16,6 +16,8 @@ from core_apps.common.renderers import GenericJSONRenderer
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny  # More concise
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 
+from core_apps.common.pagination import StandardResultsSetPagination
+
 User = get_user_model()
 # import  logging
 # logger = logging.getLogger(__name__)
@@ -24,10 +26,12 @@ User = get_user_model()
 class ApartmentListAPIView(generics.ListAPIView):
     renderer_classes = (GenericJSONRenderer,)
     serializer_class = ApartmentSerializer
+    pagination_class = StandardResultsSetPagination
     permission_classes = (AllowAny,)
     object_label = "apartments"
 
     def get_queryset(self):
+        #self.pagination_class.page_size = 4
         return Apartment.objects.filter(tenant=None)
 
 

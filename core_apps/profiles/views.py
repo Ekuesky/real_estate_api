@@ -5,7 +5,6 @@ from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics
 from rest_framework import status
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from core_apps.common.renderers import GenericJSONRenderer
@@ -16,15 +15,11 @@ from .serializers import (
     UpdateProfileSerializer,
 )
 from .tasks import upload_avatar_to_cloudinary
+from core_apps.common.pagination import StandardResultsSetPagination
 
 User = get_user_model()
 
 
-class StandardResultsSetPagination(PageNumberPagination):
-    # todo make it 9
-    page_size = 3
-    page_size_query_param = "page_size"
-    max_page_size = 100
 
 
 class ProfileListAPIView(generics.ListAPIView):
